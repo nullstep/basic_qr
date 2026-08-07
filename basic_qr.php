@@ -2,11 +2,11 @@
 
 /*
  * Plugin Name: basic_qr
- * Plugin URI: https://seventy9.co.uk/wp-plugins
- * Description: a qr code generation API plugin
- * Author: Scott A. Dixon
- * Author URI: https://seventy9.co.uk
- * Version: 1.0.0
+ * Plugin URI: https://nullstep.com/wp-plugins
+ * Description: a qr code generation plugin
+ * Author: nullstep
+ * Author URI: https://nullstep.com
+ * Version: 1.0.1
  */
 
 defined('ABSPATH') or die('⎺\_(ツ)_/⎺');
@@ -104,10 +104,9 @@ class bqr_API {
 	public function get_qrcode(WP_REST_Request $request) {
 		if (_BQRP['bqr_active'] == 'yes') {
 			$key = $request->get_param('key');
-			$keys = explode("\n", str_replace(["\r\n","\n\r","\r"], "\n", _BQRP['bqr_keys']));
 
 			if ($key) {
-				if (in_array($key, $keys)) {
+				if ($key === _BQRP['bqr_key']) {
 					$format = $request->get_param('format');
 					$value = $request->get_param('value');
 
