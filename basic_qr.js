@@ -6,7 +6,7 @@ jQuery(function($) {
 	const plugin = basic_qr;
 	const fields = [
 		'bqr_active',
-		'bqr_keys'
+		'bqr_key'
 	];
 	const editors = [
 	];
