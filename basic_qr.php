@@ -42,7 +42,7 @@ define('_ADMIN_BQR', [
 				'label' => 'API Active',
 				'type' => 'check'
 			],
-			'bqr_keys' => [
+			'bqr_key' => [
 				'label' => 'API Key',
 				'type' => 'input'
 			]
