@@ -25,7 +25,7 @@ define('_ARGS_BQR', [
 		'type' => 'string',
 		'default' => 'yes'
 	],
-	'bqr_keys' => [
+	'bqr_key' => [
 		'type' => 'string',
 		'default' => ''
 	]
@@ -43,8 +43,8 @@ define('_ADMIN_BQR', [
 				'type' => 'check'
 			],
 			'bqr_keys' => [
-				'label' => 'API Keys',
-				'type' => 'text'
+				'label' => 'API Key',
+				'type' => 'input'
 			]
 		]
 	]
