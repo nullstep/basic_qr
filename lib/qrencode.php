@@ -291,11 +291,11 @@ class QRcode {
 		$html .= '<canvas' . $eid . '" width="' . $width . '" height="' . $width . '">Your browser does not support the canvas tag</canvas>';
 		
 		if ($width !== false) {
-			$extra .= ', '.$width.', '.$width;
+			$extra .= ', ' . $width . ', ' . $width;
 		} 
 			
 		if ($margin !== false) {
-			$extra .= ', '.$margin.', '.$margin;                
+			$extra .= ', ' . $margin . ', ' . $margin;                
 		}
 		
 		$html .= '<script>if(eval("typeof "+\'QRdrawCode\'+"==\'function\'")){QRdrawCode(QRdecompactOps(\'' . $area->getCanvasOps() . '\')' . "\n" . ', \'' . $elemId . '\', ' . $area->getWidth() . ' ' . $extra . ');}else{alert(\'Please include qrcanvas.js!\');}</script>';
@@ -321,7 +321,7 @@ class QRcode {
 			}
 		}
 		
-		$svg = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="' . (-$margin) . ' ' . (-$margin) . ' ' . ($area->getWidth() + ($margin * 2)) . ' ' . ($area->getWidth() + ($margin * 2)) . '" width="' . $width . '"height="' . $width . '"' . $eid . '>' . "\n" . $area->getRawSvg() . '</svg>';
+		$svg = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="' . (-$margin) . ' ' . (-$margin) . ' ' . ($area->getWidth() + ($margin * 2)) . ' ' . ($area->getWidth() + ($margin * 2)) . '" width="' . $width . '" height="' . $width . '"' . $eid . '>' . "\n" . $area->getRawSvg() . '</svg>';
 
 		if ($outFile !== false) {
 			if ($compress === true) {

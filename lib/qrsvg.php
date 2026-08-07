@@ -14,10 +14,10 @@ class QRsvgOutput extends QRarea {
 	}
 
 	public function getRawSvg() {
-		$lib = array();
-		$svg = array();
+		$lib = [];
+		$svg = [];
 		
-		$aggregate_paths = array();
+		$aggregate_paths = [];
 		
 		foreach ($this->paths as $path) {
 			switch ($path[0]) {
