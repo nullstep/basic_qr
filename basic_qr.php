@@ -119,8 +119,9 @@ class bqr_API {
 								break;
 							}
 							case 'svg': {
-								header('Content-type: image/svg+xml');
-								echo QRcode::svg($value);
+								$svg = QRcode::svg($value);
+								$response = new WP_REST_Response($svg, 200);
+								return $response;
 								break;
 							}
 							default: {
@@ -396,5 +397,20 @@ define('_BQRP', bqr_Settings::get_settings());
 
 add_action('init', 'bqr_init');
 add_action('rest_api_init', 'bqr_api_init');
+
+add_filter('rest_pre_serve_request', function($served, $result, $request, $server) {
+    if ($request->get_route() === '/' . _PLUGIN_BQR . '-api/generate') {
+    	$header = match($request->get_param('format')) {
+    		'svg' => 'Content-Type: image/svg+xml; charset=UTF-8',
+    		'png' => 'Content-Type: image/png'
+    	};
+
+        header($header);
+        echo $result->get_data();
+        return true;
+    }
+
+    return $served;
+}, 10, 4);
 
 // eof
