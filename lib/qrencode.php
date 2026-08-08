@@ -245,7 +245,12 @@ class QRcode {
 	
 	public static function png($text, $outfile = false, $level = QR_ECLEVEL_L, $size = 3, $margin = 4, $saveandprint = false) {
 		$enc = QRencode::factory($level, $size, $margin);
-		return $enc->encodePNG($text, $outfile, $saveandprint=false);
+		return $enc->encodePNG($text, $outfile, $saveandprint = false);
+	}
+
+	public static function b64($text, $outfile = false, $level = QR_ECLEVEL_L, $size = 3, $margin = 4, $saveandprint = false) {
+		$enc = QRencode::factory($level, $size, $margin);
+		return $enc->base64PNG($text, $outfile, $saveandprint = false);
 	}
 
 	public static function text($text, $outfile = false, $level = QR_ECLEVEL_L, $size = 3, $margin = 4) {
@@ -507,6 +512,25 @@ class QRencode {
 			$maxSize = (int)(QR_PNG_MAXIMUM_SIZE / (count($tab) + 2 * $this->margin));
 			
 			QRimage::png($tab, $outfile, min(max(1, $this->size), $maxSize), $this->margin, $saveandprint);
+		}
+		catch (Exception $e) {
+			QRtools::log($outfile, $e->getMessage());
+		}
+	}
+
+	public function base64PNG($intext, $outfile = false, $saveandprint = false) {
+		try {
+			ob_start();
+			$tab = $this->encode($intext);
+			$err = ob_get_contents();
+			ob_end_clean();
+			
+			if ($err != '')
+				QRtools::log($outfile, $err);
+			
+			$maxSize = (int)(QR_PNG_MAXIMUM_SIZE / (count($tab) + 2 * $this->margin));
+			
+			return QRimage::b64($tab, $outfile, min(max(1, $this->size), $maxSize), $this->margin, $saveandprint);
 		}
 		catch (Exception $e) {
 			QRtools::log($outfile, $e->getMessage());

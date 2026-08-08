@@ -3,17 +3,29 @@
 define('QR_IMAGE', true);
 
 class QRimage {
-	public static function png($frame, $filename = false, $pixelPerPoint = 4, $outerFrame = 4,$saveandprint = FALSE) {
+	public static function b64($frame, $filename = false, $pixelPerPoint = 4, $outerFrame = 4, $saveandprint = FALSE) {
+		$image = self::image($frame, $pixelPerPoint, $outerFrame);
+
+		ob_start();
+		ImagePng($image);
+		$data = ob_get_clean();
+		
+		ImageDestroy($image);
+
+		return base64_encode($data);
+	}
+
+	public static function png($frame, $filename = false, $pixelPerPoint = 4, $outerFrame = 4, $saveandprint = FALSE) {
 		$image = self::image($frame, $pixelPerPoint, $outerFrame);
 		
 		if ($filename === false) {
-			Header("Content-type: image/png");
+			//header('Content-type: image/png');
 			ImagePng($image);
 		}
 		else {
 			if ($saveandprint === TRUE) {
 				ImagePng($image, $filename);
-				header("Content-type: image/png");
+				header('Content-type: image/png');
 				ImagePng($image);
 			}
 			else{

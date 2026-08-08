@@ -102,11 +102,11 @@ class bqr_API {
 	}
 
 	public function get_qrcode(WP_REST_Request $request) {
-		if (_BQRP['bqr_active'] == 'yes') {
+		if (_BQR['bqr_active'] == 'yes') {
 			$key = $request->get_param('key');
 
 			if ($key) {
-				if ($key === _BQRP['bqr_key']) {
+				if ($key === _BQR['bqr_key']) {
 					$format = $request->get_param('format');
 					$value = $request->get_param('value');
 
@@ -115,11 +115,11 @@ class bqr_API {
 
 						switch ($format) {
 							case 'png': {
-								QRcode::png($value);
+								QRcode::png($value, false, QR_ECLEVEL_L, 16);
 								break;
 							}
 							case 'svg': {
-								$svg = QRcode::svg($value);
+								$svg = QRcode::svg($value, false, false, QR_ECLEVEL_L, false, 16);
 								$response = new WP_REST_Response($svg, 200);
 								return $response;
 								break;
@@ -360,10 +360,81 @@ class bqr_Menu {
 //  ███    ███  ███    ███  ███   ▄███    ███    ███  
 //  ████████▀    ▀██████▀   ████████▀     ██████████
 
-// get qr code image
+// make a qr code image
 
-function bqr_get($type, $value, $filename = null) {
-	
+function bqr_make_qr($type, $value, $size = 16, $filename = null, $folder = null) {
+	require_once(_PATH_BQR . 'lib/qrlib.php');
+
+	if ($filename) {
+		if ($folder == null) {
+			$path = wp_upload_dir()['path'];
+		}
+		else {
+			$path = wp_upload_dir()['path'] . $folder;
+			if (!is_dir($path)) {
+				mkdir($path, 0755, true);
+			}
+		}
+	}
+
+	switch ($type) {
+		case 'png': {
+			if ($filename) {
+				QRcode::png($value, $path . '/' . $filename, QR_ECLEVEL_L, $size);
+				return $path . '/' . $filename;
+			}
+			else {
+				return QRcode::png($value, false, QR_ECLEVEL_L, $size);				
+			}
+
+			break;
+		}
+		case 'svg': {
+			if ($filename) {
+				QRcode::svg($value, false, $path . '/' . $filename, QR_ECLEVEL_L, false, $size);
+				return $path . '/' . $filename;
+			}
+			else {
+				return QRcode::svg($value, false, false, QR_ECLEVEL_L, $size);
+			}
+
+			break;
+		}
+		default: {
+			return false;
+		}
+	}
+}
+
+function bqr_shortcode($atts = [], $content = null, $tag = '') {
+	require_once(_PATH_BQR . 'lib/qrlib.php');
+
+	$a = shortcode_atts([
+		'size' => 16,
+		'type' => 'svg',
+		'value' => 'Hello, world!'
+	], $atts);
+
+	switch ($a['type']) {
+		case 'img': {
+			return '<img src="data:image/png;base64,' . QRcode::b64($a['value'], false, QR_ECLEVEL_L, $a['size']) . '">';
+
+			break;
+		}
+		case 'b64': {
+			return QRcode::b64($a['value'], false, QR_ECLEVEL_L, $a['size']);
+
+			break;
+		}
+		case 'svg': {
+			return QRcode::svg($a['value'], false, false, QR_ECLEVEL_L, false, $a['size']);
+
+			break;
+		}
+		default: {
+			return false;
+		}
+	}
 }
 
 // init admin
@@ -391,7 +462,7 @@ function bqr_api_init() {
 //  ███   ███    ███  ███       ███      
 //  █▀     ▀█    █▀   █▀       ▄████▀    
 
-define('_BQRP', bqr_Settings::get_settings());
+define('_BQR', bqr_Settings::get_settings());
 
 // boot plugin
 
@@ -399,18 +470,22 @@ add_action('init', 'bqr_init');
 add_action('rest_api_init', 'bqr_api_init');
 
 add_filter('rest_pre_serve_request', function($served, $result, $request, $server) {
-    if ($request->get_route() === '/' . _PLUGIN_BQR . '-api/generate') {
-    	$header = match($request->get_param('format')) {
-    		'svg' => 'Content-Type: image/svg+xml; charset=UTF-8',
-    		'png' => 'Content-Type: image/png'
-    	};
+	if ($request->get_route() === '/' . _PLUGIN_BQR . '-api/generate') {
+		$header = match($request->get_param('format')) {
+			'svg' => 'Content-Type: image/svg+xml; charset=UTF-8',
+			'png' => 'Content-Type: image/png'
+		};
 
-        header($header);
-        echo $result->get_data();
-        return true;
-    }
+		header($header);
+		echo $result->get_data();
+		return true;
+	}
 
-    return $served;
+	return $served;
 }, 10, 4);
+
+// shortcodes
+
+add_shortcode('qr', 'bqr_shortcode');
 
 // eof
