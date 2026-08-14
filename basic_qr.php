@@ -106,7 +106,7 @@ class bqr_API {
 			$key = $request->get_param('key');
 
 			if ($key) {
-				if ($key === _BQR['bqr_key']) {
+				if ($key === hash('sha256', _BQR['bqr_key'])) {
 					$format = $request->get_param('format');
 					$value = $request->get_param('value');
 
@@ -336,6 +336,24 @@ class bqr_Menu {
 								break;
 							}
 						}
+
+						if ($fid == 'bqr_key') {
+?>
+							<p id="key-hash"></p>
+							<script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/1.0.0/sha256.min.js"></script>
+							<script>
+								jQuery(function($) {
+									$('#bqr_key').on('change', function() {
+										$('#key-hash').text(sha256($(this).val()));
+									});
+								});
+								function bqr_loaded() {
+									jQuery('#key-hash').text(sha256(jQuery('#bqr_key').val()));
+								}
+							</script>
+<?php
+						}
+
 						echo '</div>';
 					}
 					echo '</div>';

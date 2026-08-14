@@ -52,6 +52,9 @@ jQuery(function($) {
 				item.codemirror.setValue($('#' + editors[index]).val());
 			});
 		});
+		if (typeof bqr_loaded === 'function') {
+			bqr_loaded();
+		}
 	});
 	editors.forEach(function(item, index, arr) {
 		var eid = $('#' + item);
